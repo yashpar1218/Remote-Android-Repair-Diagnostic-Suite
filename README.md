@@ -1,6 +1,6 @@
 # Remote Android Repair & Diagnostic Suite (RADS)
 
-A comprehensive web-based platform for mobile technicians to remotely diagnose, repair, and optimize Android devices. This project meets the SPPU (Savitribai Phule Pune University) MCA semester requirement of **16 forms** with a **MERN + Python + Java** technology stack.
+A comprehensive web-based platform for mobile technicians to remotely diagnose, repair, and optimize Android devices.
 
 ## Project Overview
 
@@ -14,7 +14,7 @@ RADS bridges the gap between low-level system commands (ADB/Fastboot) and a high
 
 ## 16-Form Structure
 
-### 1. Technician Dashboard (8 Forms)
+### 1. Technician Dashboard 
 
 | # | Form Name | File Location |
 |---|-----------|---------------|
@@ -27,7 +27,7 @@ RADS bridges the gap between low-level system commands (ADB/Fastboot) and a high
 | 7 | Logcat Viewer | `client/src/pages/technician/LogcatViewer.jsx` |
 | 8 | Repair History | `client/src/pages/technician/RepairHistory.jsx` |
 
-### 2. Customer Portal (4 Forms)
+### 2. Customer Portal 
 
 | # | Form Name | File Location |
 |---|-----------|---------------|
@@ -36,7 +36,7 @@ RADS bridges the gap between low-level system commands (ADB/Fastboot) and a high
 | 11 | Live Repair Status | `client/src/pages/customer/LiveStatus.jsx` |
 | 12 | Feedback & Rating | `client/src/pages/customer/Feedback.jsx` |
 
-### 3. Admin Control (4 Forms)
+### 3. Admin Control 
 
 | # | Form Name | File Location |
 |---|-----------|---------------|
@@ -75,7 +75,7 @@ RADS/
 │   ├── src/
 │   │   ├── components/        # Reusable UI components
 │   │   ├── layouts/           # Dashboard, Customer, Admin layouts
-│   │   ├── pages/             # All 16 forms
+│   │   ├── pages/             
 │   │   │   ├── auth/          # Login, Register
 │   │   │   ├── technician/    # 8 technician forms
 │   │   │   ├── customer/      # 4 customer forms
@@ -177,52 +177,10 @@ mvn spring-boot:run
 
 ---
 
-## API Endpoints
 
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - User login
 
-### Devices
-- `GET /api/devices` - Get all devices
-- `POST /api/devices` - Add new device
 
-### Repairs
-- `GET /api/repairs` - Get all repair requests
-- `POST /api/repairs` - Create repair request
-- `PUT /api/repairs/:id` - Update repair status
 
-### Analytics
-- `GET /api/analytics` - Get system analytics
 
----
 
-## System Architecture
 
-```
-[React UI] <---> [Node.js API] <---> [MongoDB]
-                        |
-                        v
-                [Java Spring Boot]
-                        |
-                        v
-                [Python Service]
-                        |
-                        v
-                [ADB/Fastboot]
-                        |
-                        v
-                [Android Device]
-```
-
----
-
-## License
-
-This project is for educational purposes as an MCA final semester project.
-
----
-
-## Author
-
-Created for SPPU MCA Semester Project Requirement: **16 Forms + MERN + Python + Java**
