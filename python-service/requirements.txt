@@ -1,0 +1,6 @@
+# requirements.txt for RADS python-service
+# No PyPI packages required — this service uses the Python standard library.
+# System dependencies (install separately on the host):
+# - adb (Android Platform Tools)
+# - fastboot (optional; used for fastboot device checks)
+# Recommended Python version: >=3.8

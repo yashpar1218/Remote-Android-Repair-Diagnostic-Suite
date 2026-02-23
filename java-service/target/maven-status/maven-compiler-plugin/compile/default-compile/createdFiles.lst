@@ -1,0 +1,3 @@
+com\rads\controller\ADBCommandController.class
+com\rads\RadsApplication.class
+com\rads\websocket\DeviceWebSocketHandler.class
