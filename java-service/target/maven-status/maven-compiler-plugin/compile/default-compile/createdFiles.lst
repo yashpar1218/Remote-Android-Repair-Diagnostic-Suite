@@ -1,3 +1,6 @@
 com\rads\controller\ADBCommandController.class
 com\rads\RadsApplication.class
+com\rads\config\SecurityConfig.class
+com\rads\service\ADBService.class
+com\rads\config\WebConfig.class
 com\rads\websocket\DeviceWebSocketHandler.class

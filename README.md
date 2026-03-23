@@ -55,15 +55,11 @@ RADS bridges the gap between low-level system commands (ADB/Fastboot) and a high
 - **React** - Frontend UI with Tailwind CSS
 - **Node.js** - JavaScript runtime
 
-### Python (Automation Engine)
-- **Log Parser** - Parses logcat outputs
-- **Device Analyzer** - Identifies error patterns (EMMC failure, corrupted partitions)
-- **Subprocess Module** - Executes ADB/Fastboot commands
-
 ### Java Spring Boot (Control Core)
 - **WebSocket** - Real-time device communication
 - **REST API** - Command relay between UI and client
 - **Security** - Enterprise-grade authentication
+- **ADB Command Execution** - Log parsing, device analysis via subprocess
 
 ---
 
@@ -93,10 +89,6 @@ RADS/
 │   ├── routes/                # API routes
 │   └── package.json           # Server dependencies
 │
-├── python-service/           # Python Automation
-│   ├── log_parser.py          # Logcat parser
-│   └── device_analyzer.py     # Device analysis
-│
 ├── java-service/              # Java Spring Boot
 │   ├── pom.xml                # Maven dependencies
 │   └── src/
@@ -105,8 +97,16 @@ RADS/
 │           ├── controller/    # REST controllers
 │           └── websocket/     # WebSocket handlers
 │
+├── diagrams/                  # UML Diagrams
+│   ├── deployment-diagram.puml # Deployment nodes
+│   ├── class-diagram.puml     # Domain model
+│   └── component-diagram.puml # Component architecture
+
 └── README.md                  # This file
 ```
+
+**📊 Architecture**: See `diagrams/component-diagram.puml` for component interactions (PlantUML format).
+
 
 ---
 
@@ -114,7 +114,6 @@ RADS/
 
 ### Prerequisites
 - Node.js (v18+)
-- Python (v3.8+)
 - Java JDK 17
 - MongoDB
 - Android SDK (ADB & Fastboot)
@@ -134,14 +133,6 @@ cd server
 npm install
 # Update MongoDB URI in index.js
 npm start
-```
-
-### Python Service
-```
-bash
-cd python-service
-pip install -r requirements.txt
-python log_parser.py
 ```
 
 ### Java Service
@@ -176,11 +167,3 @@ mvn spring-boot:run
 - Analytics and reporting
 
 ---
-
-
-
-
-
-
-
-

@@ -1,4 +1,4 @@
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+﻿import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
   Users, 
@@ -8,15 +8,19 @@ import {
   LogOut,
   Menu,
   X,
-  Shield
+  Shield,
+  ClipboardList,
+  User,
+  Ticket
 } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
   { icon: Users, label: 'User Management', path: '/admin/users' },
-  { icon: BookOpen, label: 'Knowledge Base', path: '/admin/knowledge' },
+  { icon: Ticket, label: 'Manage Tickets', path: '/admin/tickets' },
   { icon: FileText, label: 'Audit Logs', path: '/admin/audit' },
   { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
+  { icon: ClipboardList, label: 'Reports', path: '/admin/reports' },
 ];
 
 export default function AdminLayout() {
@@ -69,11 +73,9 @@ export default function AdminLayout() {
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
           <div className="flex items-center gap-3 mb-4">
-            <img
-              src={user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin'}
-              alt="Profile"
-              className="w-10 h-10 rounded-full bg-slate-600"
-            />
+            <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center">
+              <User className="text-white" size={20} />
+            </div>
             <div>
               <p className="text-sm font-medium text-white">{user?.name || 'Admin'}</p>
               <p className="text-xs text-purple-400">Administrator</p>
@@ -98,3 +100,4 @@ export default function AdminLayout() {
     </div>
   );
 }
+

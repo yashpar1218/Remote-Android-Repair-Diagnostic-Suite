@@ -8,15 +8,20 @@ import {
   LogOut,
   Menu,
   X,
-  Smartphone
+  Smartphone,
+  Ticket,
+  User,
+  UserCircle
 } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
   { icon: HelpCircle, label: 'Support Request', path: '/customer/support' },
+  { icon: Ticket, label: 'My Tickets', path: '/customer/tickets' },
   { icon: Cable, label: 'Connection Wizard', path: '/customer/wizard' },
   { icon: Activity, label: 'Live Status', path: '/customer/status' },
   { icon: MessageSquare, label: 'Feedback', path: '/customer/feedback' },
+  { icon: UserCircle, label: 'My Profile', path: '/customer/profile' },
 ];
 
 export default function CustomerLayout() {
@@ -26,7 +31,7 @@ export default function CustomerLayout() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/customer/login');
   };
 
   return (
@@ -68,6 +73,15 @@ export default function CustomerLayout() {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+              <User className="text-white" size={20} />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-white">{user?.name || 'Customer'}</p>
+              <p className="text-xs text-slate-400">Customer</p>
+            </div>
+          </div>
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 w-full px-4 py-2 text-red-400 hover:bg-slate-700 rounded-lg transition-colors"
@@ -87,3 +101,4 @@ export default function CustomerLayout() {
     </div>
   );
 }
+

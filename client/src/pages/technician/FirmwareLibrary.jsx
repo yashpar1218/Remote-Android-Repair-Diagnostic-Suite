@@ -12,7 +12,8 @@ import {
   ExternalLink,
   RefreshCw,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  Smartphone
 } from 'lucide-react';
 
 // Mock firmware data
@@ -239,7 +240,7 @@ export default function FirmwareLibrary() {
               <p className="text-slate-400 text-sm">Brands</p>
               <p className="text-2xl font-bold text-purple-400">{new Set(firmware.map(f => f.brand)).size}</p>
             </div>
-            <Android className="text-purple-400" size={24} />
+<Smartphone className="text-purple-400" size={24} />
           </div>
         </div>
         <div className="form-card">
@@ -260,7 +261,7 @@ export default function FirmwareLibrary() {
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
-                  <Android className="text-green-400" size={24} />
+<Smartphone className="text-green-400" size={24} />
                 </div>
                 <div>
                   <h3 className="font-semibold text-white">{fw.brand} {fw.model}</h3>

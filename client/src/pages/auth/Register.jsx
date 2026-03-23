@@ -9,8 +9,7 @@ export default function Register() {
     email: '',
     phone: '',
     password: '',
-    confirmPassword: '',
-    role: 'technician'
+    confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,16 +39,10 @@ export default function Register() {
     setLoading(true);
 
     try {
-      await register({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        role: formData.role,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${formData.name}`
-      });
-      navigate('/dashboard/devices');
+      await register(formData.name, formData.email, formData.password);
+      navigate('/customer/support');
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -104,7 +97,7 @@ export default function Register() {
                   value={formData.email}
                   onChange={handleChange}
                   className="form-input pl-10"
-                  placeholder="technician@rads.com"
+                  placeholder="your@email.com"
                   required
                 />
               </div>
@@ -121,22 +114,8 @@ export default function Register() {
                   onChange={handleChange}
                   className="form-input pl-10"
                   placeholder="+1 234 567 8900"
-                  required
                 />
               </div>
-            </div>
-
-            <div>
-              <label className="form-label">Role</label>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="form-input"
-              >
-                <option value="technician">Technician</option>
-                <option value="admin">Admin</option>
-              </select>
             </div>
 
             <div>
@@ -193,7 +172,7 @@ export default function Register() {
           <div className="mt-6 text-center">
             <p className="text-slate-400">
               Already have an account?{' '}
-              <Link to="/login" className="text-blue-400 hover:underline">
+              <Link to="/customer/login" className="text-blue-400 hover:underline">
                 Sign in
               </Link>
             </p>
@@ -203,10 +182,11 @@ export default function Register() {
         {/* Back Link */}
         <div className="mt-6 text-center">
           <Link to="/login" className="text-slate-400 hover:text-white text-sm">
-            ← Back to Login
+            ← Back to Staff Login
           </Link>
         </div>
       </div>
     </div>
   );
 }
+

@@ -1,26 +1,33 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { 
-  LayoutDashboard, 
-  Smartphone, 
-  Terminal, 
-  HardDrive, 
-  FileCode, 
-  History, 
+import {
+  LayoutDashboard,
+  Smartphone,
+  Terminal,
+  HardDrive,
+  FileCode,
+  History,
   LogOut,
   Menu,
-  X
+  X,
+  Ticket,
+  User,
+  BookOpen,
+  Activity
 } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Active Devices', path: '/dashboard/devices' },
-  { icon: Smartphone, label: 'Device Specs', path: '/dashboard/devices' },
-  { icon: Terminal, label: 'Terminal Console', path: '/dashboard/devices' },
-  { icon: HardDrive, label: 'Partition Health', path: '/dashboard/devices' },
+  { icon: Ticket, label: 'Active Tickets', path: '/dashboard/tickets' },
+  { icon: Smartphone, label: 'Device Specs', path: '/dashboard/specs' },
+  { icon: Terminal, label: 'Terminal Console', path: '/dashboard/terminal' },
+  { icon: HardDrive, label: 'Partition Health', path: '/dashboard/partition' },
+  { icon: Activity, label: 'Device Health', path: '/technician/device-health' },
   { icon: FileCode, label: 'Firmware Library', path: '/dashboard/firmware' },
-  { icon: Terminal, label: 'Logcat Viewer', path: '/dashboard/devices' },
+  { icon: Terminal, label: 'Logcat Viewer', path: '/dashboard/logs' },
   { icon: History, label: 'Repair History', path: '/dashboard/history' },
+  { icon: BookOpen, label: 'Knowledge Base', path: '/technician/knowledge-base' }
 ];
 
 export default function DashboardLayout() {
@@ -35,61 +42,58 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-slate-900">
-      {/* Mobile sidebar toggle */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      <div className="fixed left-4 top-4 z-50 lg:hidden">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 bg-slate-800 rounded-lg text-white"
+          className="rounded-lg bg-slate-800 p-2 text-white"
         >
           {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-40 h-screen w-64 bg-slate-800 border-r border-slate-700 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform`}>
-        <div className="p-6">
-          <h1 className="text-2xl font-bold text-blue-400">RADS</h1>
-          <p className="text-xs text-slate-400">Remote Android Repair Suite</p>
-        </div>
-
-        <nav className="px-4 space-y-2">
-          {navItems.map((item, index) => (
-            <Link
-              key={index}
-              to={item.path}
-              className="flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-700 rounded-lg transition-colors"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <item.icon size={20} />
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
-          <div className="flex items-center gap-3 mb-4">
-            <img
-              src={user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=technician'}
-              alt="Profile"
-              className="w-10 h-10 rounded-full bg-slate-600"
-            />
-            <div>
-              <p className="text-sm font-medium text-white">{user?.name || 'Technician'}</p>
-              <p className="text-xs text-slate-400">Online</p>
-            </div>
+      <aside className={`fixed left-0 top-0 z-40 h-screen w-64 border-r border-slate-700 bg-slate-800 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform lg:translate-x-0`}>
+        <div className="flex h-full flex-col">
+          <div className="shrink-0 p-6">
+            <h1 className="text-2xl font-bold text-blue-400">RADS</h1>
+            <p className="text-xs text-slate-400">Remote Android Repair Suite</p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 w-full px-4 py-2 text-red-400 hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <LogOut size={18} />
-            <span>Logout</span>
-          </button>
+
+          <nav className="min-h-0 flex-1 space-y-2 overflow-y-auto px-4 pb-4">
+            {navItems.map((item, index) => (
+              <Link
+                key={index}
+                to={item.path}
+                className="flex items-center gap-3 rounded-lg px-4 py-3 text-slate-300 transition-colors hover:bg-slate-700"
+                onClick={() => setSidebarOpen(false)}
+              >
+                <item.icon size={20} />
+                <span>{item.label}</span>
+              </Link>
+            ))}
+          </nav>
+
+          <div className="shrink-0 border-t border-slate-700 p-4">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600">
+                <User className="text-white" size={20} />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-white">{user?.name || 'Technician'}</p>
+                <p className="text-xs text-blue-400">Technician</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-red-400 transition-colors hover:bg-slate-700"
+            >
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* Main content */}
-      <main className="lg:ml-64 min-h-screen">
+      <main className="min-h-screen lg:ml-64">
         <div className="p-6 pt-16 lg:pt-6">
           <Outlet />
         </div>
@@ -97,3 +101,4 @@ export default function DashboardLayout() {
     </div>
   );
 }
+

@@ -1,257 +1,178 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { 
-  Smartphone, 
-  Battery, 
-  Cpu, 
-  HardDrive, 
-  Camera, 
-  Network,
-  Lock,
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import {
+  Cpu,
+  Globe,
+  Loader2,
+  MemoryStick,
+  Monitor,
+  Package,
   RefreshCw,
-  ArrowLeft,
-  Copy,
-  Check
+  Settings,
+  Smartphone,
+  AlertCircle,
+  ArrowLeft
 } from 'lucide-react';
+import DeviceSelectionGrid from '../../components/technician/DeviceSelectionGrid';
 
-// Mock device data
-const mockDeviceData = {
-  id: '1',
-  name: 'Samsung Galaxy S21',
-  model: 'SM-G991B',
-  manufacturer: 'Samsung',
-  brand: 'Samsung',
-  device: 'o1s',
-  hardware: 'exynos2100',
-  board: 'exynos2100',
-  androidVersion: '13',
-  securityPatch: '2024-01-01',
-  buildNumber: 'RP1A.200720.012',
-  bootloader: 'Locked',
-  carrier: 'Unlocked',
-  SIMStatus: 'Dual SIM',
-  networkType: '5G',
-  imei: '356987401234567',
-  imei2: '356987401234568',
-  serialNumber: 'R5CR12345ABC',
-  batteryLevel: 85,
-  batteryTemp: 28,
-  batteryVoltage: 4200,
-  charging: false,
-  Cpu: {
-    cores: 8,
-    architecture: 'ARM64',
-    frequencies: ['2.9 GHz', '2.8 GHz', '2.2 GHz', '1.9 GHz']
-  },
-  RAM: {
-    total: '8 GB',
-    available: '4.2 GB',
-    used: '3.8 GB'
-  },
-  Storage: {
-    total: '128 GB',
-    available: '64 GB',
-    used: '64 GB'
-  },
-  Display: {
-    resolution: '2400 x 1080',
-    density: '421 DPI',
-    refreshRate: '120 Hz',
-    size: '6.2 inches'
-  },
-  Cameras: [
-    { type: 'Main', mp: '12 MP', aperture: 'f/1.8' },
-    { type: 'Ultra Wide', mp: '12 MP', aperture: 'f/2.2' },
-    { type: 'Telephoto', mp: '64 MP', aperture: 'f/2.0' },
-    { type: 'Front', mp: '10 MP', aperture: 'f/2.2' }
-  ],
-  Sensors: [
-    'Accelerometer', 'Gyroscope', 'Proximity', 'Compass', 
-    'Barometer', 'Fingerprint', 'Face Recognition', 'NFC'
-  ]
-};
+const JAVA_API = 'http://localhost:8080';
 
 export default function DeviceSpecs() {
   const { deviceId } = useParams();
-  const [device, setDevice] = useState(mockDeviceData);
+  const navigate = useNavigate();
+  const [deviceInfo, setDeviceInfo] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState('');
+  const [error, setError] = useState(null);
 
-  const handleRefresh = () => {
-    setLoading(true);
-    setTimeout(() => setLoading(false), 1000);
+  const fetchDeviceInfo = async () => {
+    if (!deviceId) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`${JAVA_API}/api/adb/device-info/${deviceId}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setDeviceInfo(data.properties || {});
+      } else {
+        setError(data.error || 'Failed to fetch device info');
+      }
+    } catch (err) {
+      console.error('Error fetching device info:', err);
+      setError('Failed to connect to ADB service. Make sure Java service is running on port 8080.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const copyToClipboard = (text, field) => {
-    navigator.clipboard.writeText(text);
-    setCopied(field);
-    setTimeout(() => setCopied(''), 2000);
-  };
+  useEffect(() => {
+    fetchDeviceInfo();
+  }, [deviceId]);
 
-  const InfoRow = ({ icon: Icon, label, value, copy }) => (
-    <div className="flex items-center justify-between py-3 border-b border-slate-700 last:border-0">
-      <div className="flex items-center gap-3">
-        <Icon className="text-blue-400" size={18} />
-        <span className="text-slate-400">{label}</span>
+  if (!deviceId) {
+    return (
+      <DeviceSelectionGrid
+        title="Device Specifications"
+        description="Choose a connected device to open its specifications."
+        buildPath={(selectedId) => `/dashboard/specs/${selectedId}`}
+      />
+    );
+  }
+
+  const renderProperty = (icon, label, value) => {
+    if (!value) return null;
+    return (
+      <div className="flex justify-between py-3 border-b border-slate-700 last:border-0 gap-4">
+        <div className="flex items-center gap-3">
+          {icon}
+          <span className="text-slate-400">{label}</span>
+        </div>
+        <span className="text-white font-medium text-right">{value}</span>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="text-white font-medium">{value}</span>
-        {copy && (
-          <button
-            onClick={() => copyToClipboard(value, copy)}
-            className="text-slate-400 hover:text-white"
-          >
-            {copied === copy ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
+    );
+  };
+
+  if (loading && !deviceInfo) {
+    return (
+      <div className="flex items-center justify-center py-20 gap-3 text-slate-300">
+        <Loader2 className="animate-spin text-blue-400" size={48} />
+        Fetching device information...
+      </div>
+    );
+  }
+
+  if (error && !deviceInfo) {
+    return (
+      <div>
+        <div className="flex items-center gap-4 mb-6">
+          <button onClick={() => navigate('/dashboard/specs')} className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white">
+            <ArrowLeft size={20} />
           </button>
-        )}
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-white">Device Specifications</h1>
+            <p className="text-slate-400">Device ID: {deviceId}</p>
+          </div>
+          <button onClick={fetchDeviceInfo} className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white">
+            <RefreshCw size={18} />
+            Retry
+          </button>
+        </div>
+
+        <div className="form-card">
+          <div className="flex items-center gap-4 text-red-400">
+            <AlertCircle size={24} />
+            <div>
+              <h3 className="font-semibold">Error Fetching Device Info</h3>
+              <p className="text-sm text-slate-400">{error}</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div>
-      {/* Header */}
       <div className="flex items-center gap-4 mb-6">
-        <Link
-          to="/dashboard/devices"
-          className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white"
-        >
+        <button onClick={() => navigate('/dashboard/specs')} className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white">
           <ArrowLeft size={20} />
-        </Link>
+        </button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-white">Device Specifications</h1>
-          <p className="text-slate-400">{device.name} - {device.model}</p>
+          <p className="text-slate-400">Device ID: {deviceId}</p>
         </div>
-        <button
-          onClick={handleRefresh}
-          className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white"
-        >
+        <button onClick={fetchDeviceInfo} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white disabled:opacity-50">
           <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
-          Refresh
+          {loading ? 'Loading...' : 'Refresh'}
         </button>
       </div>
 
-      {/* Device Info Card */}
-      <div className="form-card mb-6">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-slate-700 rounded-2xl flex items-center justify-center">
-            <Smartphone className="text-blue-400" size={32} />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-white">{device.name}</h2>
-            <p className="text-slate-400">{device.manufacturer} {device.model}</p>
-          </div>
-          <div className="ml-auto text-right">
-            <div className="flex items-center gap-2 mb-1">
-              <Battery className="text-green-400" size={20} />
-              <span className="text-2xl font-bold text-white">{device.batteryLevel}%</span>
-            </div>
-            <p className="text-xs text-slate-400">{device.batteryTemp}°C</p>
-          </div>
-        </div>
+      <div className="flex gap-2 mb-6">
+        <Link to={`/dashboard/logs/${deviceId}`} className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white text-sm">View Logs</Link>
+        <Link to={`/dashboard/partition/${deviceId}`} className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white text-sm">Partition Health</Link>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-slate-700/50 rounded-lg p-3">
-            <p className="text-xs text-slate-400 mb-1">Android</p>
-            <p className="text-white font-semibold">Android {device.androidVersion}</p>
-          </div>
-          <div className="bg-slate-700/50 rounded-lg p-3">
-            <p className="text-xs text-slate-400 mb-1">Security Patch</p>
-            <p className="text-white font-semibold">{device.securityPatch}</p>
-          </div>
-          <div className="bg-slate-700/50 rounded-lg p-3">
-            <p className="text-xs text-slate-400 mb-1">Bootloader</p>
-            <p className={`font-semibold ${device.bootloader === 'Locked' ? 'text-red-400' : 'text-green-400'}`}>
-              {device.bootloader}
-            </p>
-          </div>
-          <div className="bg-slate-700/50 rounded-lg p-3">
-            <p className="text-xs text-slate-400 mb-1">Network</p>
-            <p className="text-white font-semibold">{device.networkType}</p>
-          </div>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Device Identity */}
         <div className="form-card">
-          <h3 className="text-lg font-semibold text-white mb-4">Device Identity</h3>
-          <InfoRow icon={Lock} label="IMEI" value={device.imei} copy="imei" />
-          <InfoRow icon={Smartphone} label="IMEI 2" value={device.imei2} copy="imei2" />
-          <InfoRow icon={Lock} label="Serial Number" value={device.serialNumber} copy="serial" />
-          <InfoRow icon={Lock} label="Build Number" value={device.buildNumber} copy="build" />
-          <InfoRow icon={Network} label="SIM Status" value={device.SIMStatus} />
-          <InfoRow icon={Network} label="Carrier" value={device.carrier} />
-        </div>
-
-        {/* Hardware Info */}
-        <div className="form-card">
-          <h3 className="text-lg font-semibold text-white mb-4">Hardware</h3>
-          <InfoRow icon={Cpu} label="Cpu Cores" value={device.Cpu.cores} />
-          <InfoRow icon={Cpu} label="Architecture" value={device.Cpu.architecture} />
-          <InfoRow icon={Cpu} label="Cpu" value={device.Cpu.frequencies.join(', ')} />
-          <InfoRow icon={Storage} label="RAM" value={device.RAM.total} />
-          <InfoRow icon={Storage} label="Storage" value={device.Storage.total} />
-          <InfoRow icon={Smartphone} label="Display" value={device.Display.size} />
-        </div>
-
-        {/* Storage Info */}
-        <div className="form-card">
-          <h3 className="text-lg font-semibold text-white mb-4">Storage & RAM</h3>
-          <div className="mb-4">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-slate-400">RAM Usage</span>
-              <span className="text-white">{device.RAM.used} / {device.RAM.total}</span>
-            </div>
-            <div className="w-full bg-slate-700 rounded-full h-2">
-              <div className="bg-blue-500 h-2 rounded-full" style={{ width: '47%' }}></div>
-            </div>
-          </div>
-          <div className="mb-4">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-slate-400">Storage Usage</span>
-              <span className="text-white">{device.Storage.used} / {device.Storage.total}</span>
-            </div>
-            <div className="w-full bg-slate-700 rounded-full h-2">
-              <div className="bg-green-500 h-2 rounded-full" style={{ width: '50%' }}></div>
-            </div>
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <Smartphone className="text-blue-400" size={20} />
+            Device Identity
+          </h3>
+          <div className="space-y-1">
+            {renderProperty(<Smartphone size={16} className="text-slate-500" />, 'Model', deviceInfo?.Model)}
+            {renderProperty(<Monitor size={16} className="text-slate-500" />, 'Manufacturer', deviceInfo?.Manufacturer)}
+            {renderProperty(<Cpu size={16} className="text-slate-500" />, 'Serial Number', deviceInfo?.['Serial Number'])}
           </div>
         </div>
 
-        {/* Cameras */}
         <div className="form-card">
-          <h3 className="text-lg font-semibold text-white mb-4">Cameras</h3>
-          <div className="space-y-3">
-            {device.Cameras.map((camera, index) => (
-              <div key={index} className="flex items-center justify-between py-2 border-b border-slate-700 last:border-0">
-                <div className="flex items-center gap-3">
-                  <Camera className="text-purple-400" size={18} />
-                  <span className="text-slate-300">{camera.type}</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-white font-medium">{camera.mp}</span>
-                  <span className="text-slate-400 text-sm ml-2">{camera.aperture}</span>
-                </div>
-              </div>
-            ))}
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <Settings className="text-blue-400" size={20} />
+            System Information
+          </h3>
+          <div className="space-y-1">
+            {renderProperty(<Globe size={16} className="text-slate-500" />, 'Android Version', deviceInfo?.['Android Version'])}
+            {renderProperty(<Cpu size={16} className="text-slate-500" />, 'SDK Version', deviceInfo?.['SDK Version'])}
+            {renderProperty(<MemoryStick size={16} className="text-slate-500" />, 'Build', deviceInfo?.['Build'])}
           </div>
         </div>
 
-        {/* Sensors */}
         <div className="form-card lg:col-span-2">
-          <h3 className="text-lg font-semibold text-white mb-4">Sensors</h3>
-          <div className="flex flex-wrap gap-2">
-            {device.Sensors.map((sensor, index) => (
-              <span
-                key={index}
-                className="px-3 py-1 bg-slate-700 rounded-full text-sm text-slate-300"
-              >
-                {sensor}
-              </span>
-            ))}
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <Package className="text-blue-400" size={20} />
+            All Properties
+          </h3>
+          <div className="bg-slate-800 rounded-lg p-4 max-h-96 overflow-y-auto">
+            <pre className="text-sm text-green-400 font-mono whitespace-pre-wrap">
+              {deviceInfo ? JSON.stringify(deviceInfo, null, 2) : 'No data available'}
+            </pre>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+
